@@ -1,0 +1,5 @@
+userId - discord id for user
+userName - username for discord user, not nickname
+points - activity points 
+tier - tier of payment
+lastActivity - date of last activity

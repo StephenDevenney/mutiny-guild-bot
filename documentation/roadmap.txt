@@ -1,0 +1,13 @@
+alpha 1.0.0
+bot is in alpha when it can store and load data,
+bot can add and remove points
+bot can list all members with points
+
+beta 1.0.0
+bot is in beta when it can return a table of activity points along with members
+bot can find specific member
+
+release 1.0.0
+bot can perform payout function.
+
+-----------------------------

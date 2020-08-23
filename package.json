@@ -1,0 +1,20 @@
+{
+  "name": "mutiny-activity-bot",
+  "version": "1.0.0",
+  "description": "bot test",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Commander386",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^7.0.1",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "node-gyp": "^7.0.0",
+    "bot-help": "1.0.0"
+  },
+  "devDependencies": {}
+}

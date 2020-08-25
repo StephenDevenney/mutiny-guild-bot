@@ -112,7 +112,7 @@ exports.docs = function embededDocs(){
     let message = new DiscordH.MessageEmbed()
         .setColor(3447003)
         .setTitle('Documentation')
-        .setDescription('[Docs](https://docs.google.com/document/d/1y2B7kS1lCX_0_SFnUt0jetUe64LAndCwvzge0j5i5UM/edit?usp=sharing)\n\nContact <@114829320093958151> with any questions.')
+        .setDescription('[Docs](https://docs.google.com/document/d/1y2B7kS1lCX_0_SFnUt0jetUe64LAndCwvzge0j5i5UM/edit?usp=sharing)\n\nContact <@' + process.env.USER_COMMANDER386_ID + '> with any questions.')
         .setTimestamp()
         .setFooter('Mutiny');
 
@@ -127,7 +127,7 @@ exports.errorMessage = function(msg, error, clientMessage){
         .addFields({name: "Where: ", value: msg})
         .addFields({name: "Content: ", value: clientMessage.content})
         .addFields({name: "Author: ", value: clientMessage.author.username})
-        if(error != null || error != undefined);
+        if(error != null || error != undefined)
             exampleEmbed.addFields({name: "Error: ", value: error});
         exampleEmbed.setTimestamp()
         exampleEmbed.setFooter('Mutiny');

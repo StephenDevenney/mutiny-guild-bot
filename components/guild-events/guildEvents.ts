@@ -186,12 +186,12 @@ exports.sendAnnouncementMessage = function(event){
     let returnMessage = "";
     let countdown = eventCountdown(event.eventDateTime);
     if(countdown[0] == 0 && countdown[1] == 3 && countdown[2] == 0){// 3 Hours
-        returnMessage = "<@&495339225366134788> 3 hours until " + event.eventName + ", check <#731972787773636639> for more details.";
+        returnMessage = "<@&" + process.env.ROLE_MEMBER_ID + "> 3 hours until " + event.eventName + ", check <#" + process.env.CHANNEL_GUILD_EVENTS_ID + "> for more details.";
         if(event.eventName.includes("Khan"))
             returnMessage += "\nPlease remember that the server is subject to change depending on if a guild is currently doing Khan at this time."
     }
     else if(countdown[0] == 0 && countdown[1] == 1 && countdown[2] == 0){// 1 hour
-        returnMessage = "<@&495339225366134788> 1 hour until " + event.eventName + ", check <#731972787773636639> for more details.";
+        returnMessage = "<@&" + process.env.ROLE_MEMBER_ID + "> 1 hour until " + event.eventName + ", check <#" + process.env.CHANNEL_GUILD_EVENTS_ID + "> for more details.";
         if(event.eventName.includes("Khan"))
             returnMessage += "\nPlease remember that the server is subject to change depending on if a guild is currently doing Khan at this time."
     }

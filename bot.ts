@@ -13,7 +13,7 @@ const guideCmds = require('./components/guides/guides.ts');
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    let guild = client.guilds.cache.get('495327379724697610');
+    let guild = client.guilds.cache.get(process.env.SERVER_ID);
     const table = sql.prepare("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = 'mutiny';").get();
     if (!table['count(*)']) {
         sql.prepare("CREATE TABLE mutiny (id INTEGER PRIMARY KEY AUTOINCREMENT, userId TEXT, userName TEXT, points INTEGER, tier TEXT, lastActivity TEXT, questCount INTEGER)").run();
@@ -124,7 +124,7 @@ client.on('ready', () => {
     }
 
     guild.channels.cache.forEach(channel => {   
-        if(channel.name == process.env.CHANNEL_EVENTS){
+        if(channel.id == process.env.CHANNEL_GUILD_EVENTS_ID){
             let i = 0;
             updateEventCountdown();
             function updateEventCountdown(){
@@ -157,7 +157,7 @@ client.on('ready', () => {
     // Announce Event Reminder
     function messageFilter(msg){
         if(msg != "do not send")
-            client.channels.cache.get('563544772997021737').send(msg);
+            client.channels.cache.get(process.env.CHANNEL_ANNOUNCEMENTS_ID).send(msg);
     }
     client.user.setActivity("PEN Roulette", {});
 });
@@ -179,6 +179,8 @@ client.on('guildMemberAdd', member => {
 });
 
 client.on('message', message => {
+    // let guild = client.guilds.cache.get(process.env.SERVER_ID);
+
     if(message.author.bot) return;
     if(message.channel.type === process.env.DIRECT_MESSAGE){
         try {
@@ -212,21 +214,21 @@ client.on('message', message => {
     client.addEvent = sql.prepare("INSERT OR REPLACE INTO events (eventName, eventDate, eventTime, isRecurring, serverName) VALUES (@eventName, @eventDate, @eventTime, @isRecurring, @serverName)");
     // Bosses
 
-    if(message.channel.name == process.env.CHANNEL_OFFICER)
+    if(message.channel.id == process.env.CHANNEL_GUILD_BOT_ID)
         activity();
 
-    if(message.channel.name == process.env.CHANNEL_GUIDES)
+    if(message.channel.id == process.env.CHANNEL_GUIDES_ID)
         guidesChannel();
 
-    if(message.channel.name == process.env.CHANNEL_GAMES_ROOM)
+    if(message.channel.id == process.env.CHANNEL_GAMES_ROOM_ID)
         gamesRoom();
 
     // Activity
     function activity(){
     // check user roles instead of channel
-    if(!message.member.roles.cache.some(role => role.name === "Officer" || role.name === "Guild Master")) return message.channel.send("Unauthorized user"); 
+    if(!message.member.roles.cache.some(role => role.id === process.env.ROLE_GUILD_MASTER_ID || role.id === process.env.ROLE_OFFICER_ID)) return message.channel.send("Unauthorized user"); 
 
-    if(message.channel.name != process.env.CHANNEL_OFFICER) return;
+    if(message.channel.id != process.env.CHANNEL_GUILD_BOT_ID) return;
 
     // Check Shorthand
     let shorthand = false;
@@ -260,54 +262,54 @@ client.on('message', message => {
         case 'a':
         case '+':        
         try {
-            let userCollection = [];
-            let possibleUsers = args.slice(0, (args.length-1));
-            try{
-                possibleUsers.forEach(item => {
-                    if(findCmds.userExists(item, client)){
-                        let user = findCmds.getUser(item,client, message);
-                        if(!user.bot && !findCmds.collectionContainsDuplicate(user, userCollection))
-                            userCollection.push(user);
-                    }  
-                });
-            }
-            catch(err){
-                messageFilter("Incorrect Syntax.");
-                let errMessage = helpCmds.errorMessage("Error adding points", err, message);
-                messageModerator(errMessage);
-                return;
-            }
+            // let userCollection = [];
+            // let possibleUsers = args.slice(0, (args.length-1));
+            // try{
+            //     possibleUsers.forEach(item => {
+            //         if(findCmds.userExists(item, client)){
+            //             let user = findCmds.getUser(item,client, message);
+            //             if(!user.bot && !findCmds.collectionContainsDuplicate(user, userCollection))
+            //                 userCollection.push(user);
+            //         }  
+            //     });
+            // }
+            // catch(err){
+            //     messageFilter("Incorrect Syntax.");
+            //     let errMessage = helpCmds.errorMessage("Error adding points", err, message);
+            //     messageModerator(errMessage);
+            //     return;
+            // }
             
-            if(userCollection.length == 0){
-                messageFilter("User not found"); 
-                return;
-            }
-            let argsPoints = args[args.length-1];
-            let activityPoints = args[args.length-1];
-            if(findCmds.userExists(activityPoints, client)){
-                messageFilter("Incorrect Syntax.");    
-                return;
-            }
-            userCollection.forEach(item => {
-                let userObj = item;
-                givenPoints = 0;
-                let user = client.findUser.get(userObj.username);        
-                let activityPoints = activityCmds.addPoints(argsPoints, user.points);
-                if(activityPoints === undefined || isNaN(activityPoints))
-                    messageFilter("Incorrect Syntax.");       
-                else{
-                    user.points = activityPoints;
-                    user.lastActivity = Date.now();
-                    user.questCount++;
-                    client.updateUserPoints.run([user.points, user.userId]);
-                    client.updateLastActivity.run([user.lastActivity, user.userId]);
-                    client.updateQuestCount.run([user.questCount, user.userId]);
-                    messageFilter(activityCmds.embededActivityMessage(user.userName, argsPoints, user.points, user.questCount, command));
-                } 
-            });
-            break;
-            // messageFilter("Not Implemented.");
+            // if(userCollection.length == 0){
+            //     messageFilter("User not found"); 
+            //     return;
+            // }
+            // let argsPoints = args[args.length-1];
+            // let activityPoints = args[args.length-1];
+            // if(findCmds.userExists(activityPoints, client)){
+            //     messageFilter("Incorrect Syntax.");    
+            //     return;
+            // }
+            // userCollection.forEach(item => {
+            //     let userObj = item;
+            //     givenPoints = 0;
+            //     let user = client.findUser.get(userObj.username);        
+            //     let activityPoints = activityCmds.addPoints(argsPoints, user.points);
+            //     if(activityPoints === undefined || isNaN(activityPoints))
+            //         messageFilter("Incorrect Syntax.");       
+            //     else{
+            //         user.points = activityPoints;
+            //         user.lastActivity = Date.now();
+            //         user.questCount++;
+            //         client.updateUserPoints.run([user.points, user.userId]);
+            //         client.updateLastActivity.run([user.lastActivity, user.userId]);
+            //         client.updateQuestCount.run([user.questCount, user.userId]);
+            //         messageFilter(activityCmds.embededActivityMessage(user.userName, argsPoints, user.points, user.questCount, command));
+            //     } 
+            // });
             // break;
+            messageFilter("Not Implemented.");
+            break;
         } 
         catch (err){
             let errMessage = helpCmds.errorMessage("Error adding points", err, message);
@@ -320,30 +322,30 @@ client.on('message', message => {
         case 'r':
         case '-': 
             try{
-                let [userObj, activityPoints] = args;
-                try{
-                    userExists = findCmds.userExists(userObj.toLowerCase(), client);
-                }catch{
-                    userExists = false;
-                }
-                if(!userExists){
-                    messageFilter("User not found"); 
-                    break;
-                }
-                user = findCmds.getUser(userObj, client, message);
-                user = client.findUser.get(user.username);  
-                givenPoints = activityPoints;   
-                activityPoints = activityCmds.removePoints(activityPoints, user.points);
-                if(activityPoints === undefined || isNaN(Number(activityPoints)))
-                    messageFilter("Incorrect Syntax.");       
-                else{
-                    user.points = activityPoints;
-                    client.updateUserPoints.run([user.points, user.userId]);
-                    messageFilter(activityCmds.embededActivityMessage(user.userName, givenPoints, user.points, user.questCount, command));
-                } 
-                break;
-                // messageFilter("Not Implemented.");
+                // let [userObj, activityPoints] = args;
+                // try{
+                //     userExists = findCmds.userExists(userObj.toLowerCase(), client);
+                // }catch{
+                //     userExists = false;
+                // }
+                // if(!userExists){
+                //     messageFilter("User not found"); 
+                //     break;
+                // }
+                // user = findCmds.getUser(userObj, client, message);
+                // user = client.findUser.get(user.username);  
+                // givenPoints = activityPoints;   
+                // activityPoints = activityCmds.removePoints(activityPoints, user.points);
+                // if(activityPoints === undefined || isNaN(Number(activityPoints)))
+                //     messageFilter("Incorrect Syntax.");       
+                // else{
+                //     user.points = activityPoints;
+                //     client.updateUserPoints.run([user.points, user.userId]);
+                //     messageFilter(activityCmds.embededActivityMessage(user.userName, givenPoints, user.points, user.questCount, command));
+                // } 
                 // break;
+                messageFilter("Not Implemented.");
+                break;
             }
             catch(err){
                 let errMessage = helpCmds.errorMessage("Error removing points", err, message);
@@ -396,7 +398,7 @@ client.on('message', message => {
                 }
                 user = findCmds.getUser(userObj, client, message);
                 user = client.findUser.get(user.username);  
-                let discU = findCmds.getDiscUser(userObj, client, message);
+                // let discU = findCmds.getDiscUser(userObj, client, message);
                 messageFilter(findCmds.embededFindMessage(user));
                 break;
             }

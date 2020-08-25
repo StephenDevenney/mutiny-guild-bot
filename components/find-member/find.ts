@@ -5,7 +5,7 @@ exports.userExists = function(userObj, client){
     if (userObj.includes("!") || userObj.includes("@"))
         found = true;                  
     else{  
-        let guild = client.guilds.cache.get('415964135394770944');
+        let guild = client.guilds.cache.get(process.env.ID_SERVER);
         client.users.cache.forEach(element => {   
             if (guild.member(element.id) && guild.member(element.id).user.bot == false){    
                 if(element.username.toLowerCase() === userObj.toLowerCase() && !element.bot)

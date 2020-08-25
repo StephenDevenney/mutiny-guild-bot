@@ -374,7 +374,7 @@ client.on('message', message => {
                     }while(msgList.length > 0)
                 }       
                 else
-                    messageFilter("No Activity");
+                    messageFilter("No activity yet this week");
 
                 break;
             }catch (err){

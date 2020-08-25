@@ -2,7 +2,7 @@
   "name": "mutiny-activity-bot",
   "version": "1.0.0",
   "description": "bot test",
-  "main": "bot.js",
+  "main": "bot.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,10 +11,17 @@
   "license": "ISC",
   "dependencies": {
     "better-sqlite3": "^7.0.1",
+    "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
+    "jsdom": "^16.2.2",
+    "moment": "^2.27.0",
     "node-gyp": "^7.0.0",
-    "bot-help": "1.0.0"
+    "request": "^2.88.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StephenDevenney/mutiny-guild-bot.git"
   },
   "devDependencies": {}
 }

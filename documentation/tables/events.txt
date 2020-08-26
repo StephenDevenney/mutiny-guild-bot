@@ -1,0 +1,6 @@
+id - number (index)
+eventName - string
+eventDate - string
+eventTime - string
+isRecurring - bit
+serverName - string

@@ -1,0 +1,5 @@
+id - number (index)
+bossName - string
+bossDate - string
+bossTime - string
+alert - bit

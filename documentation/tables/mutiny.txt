@@ -1,0 +1,7 @@
+id - number (index)
+memberId - string
+userName - string
+points - number
+tier - number
+lastAtivity - date
+questCount - number

@@ -1,8 +1,0 @@
-ahoy add Commander386 10
-ahoy remove Commander386 5
-ahoy view
-ahoy find Commander386
-ahoy payout
-ahoy help
-
-default - Unknown Command

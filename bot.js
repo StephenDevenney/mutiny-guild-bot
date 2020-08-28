@@ -5,11 +5,11 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const SQLite = require("better-sqlite3");
 const sql = new SQLite('./scores.sqlite');
-const helpCmds = require('./components/help/help.ts');
-const findCmds = require('./components/find-member/find.ts');
-const activityCmds = require('./components/activity-management/activity.ts');
-const eventCmds = require('./components/guild-events/guildEvents.ts');
-const guideCmds = require('./components/guides/guides.ts');
+const helpCmds = require('./components/help/help.js');
+const findCmds = require('./components/find-member/find.js');
+const activityCmds = require('./components/activity-management/activity.js');
+const eventCmds = require('./components/guild-events/guildEvents.js');
+const guideCmds = require('./components/guides/guides.js');
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -70,8 +70,8 @@ client.on('ready', () => {
     client.dropBoss = sql.prepare("DELETE FROM bosses WHERE id = ?");
 
     let upcomingEvents = [];
-    reload();
-    function reload() {
+    reloadEvents();
+    function reloadEvents() {
         let eventList = client.selectAllEvents.all();
         let eventArray = [];
 
@@ -94,13 +94,17 @@ client.on('ready', () => {
                         //update time
                         let nextWeek = dateTime + 7 * 24 * 60 * 60 * 1000;
                         dateTime = nextWeek;
-                        let updatedDateString = new Date(nextWeek).toLocaleDateString();
-                        let updatedDate = new Date(updatedDateString);
-                        updatedDateString = ('0' + updatedDate.getDate()).slice(-2) + '/'
+                        let updatedDate = new Date(nextWeek).toLocaleDateString();
+                        updatedDate = new Date(updatedDate);
+                        updatedDate = ('0' + updatedDate.getDate()).slice(-2) + '/'
                         + ('0' + (updatedDate.getMonth()+1)).slice(-2) + '/'
                         + updatedDate.getFullYear();
-                        let updatedTime = new Date(nextWeek).toLocaleTimeString();
-                        client.updateEventDate.run([updatedDateString, item.id]);
+
+                        let nextWeekDate = new Date(nextWeek);
+                        let updatedTime = ('0' + nextWeekDate.getHours()).slice(-2) + ':'
+                        + ('0' + nextWeekDate.getMinutes()).slice(-2) + ':00';
+                        
+                        client.updateEventDate.run([updatedDate, item.id]);
                         client.updateEventTime.run([updatedTime, item.id]);
                     }
                     else{
@@ -134,11 +138,11 @@ client.on('ready', () => {
                         try{
                             setInterval(function() {
                                 lastMessage.edit(eventCmds.guildEventsMessage(upcomingEvents));
-                                reload();
+                                reloadEvents();
                             }, 60000)//60000
                         }
-                        catch{
-
+                        catch(err){
+                            console.log(err);
                         }
                         
                     }

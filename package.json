@@ -2,7 +2,7 @@
   "name": "mutiny-activity-bot",
   "version": "1.0.0",
   "description": "bot test",
-  "main": "bot.ts",
+  "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -2,3 +2,5 @@
 scores.sqlite
 scores.sqlite-shm
 scores.sqlite-wal
+mutiny-db.sqlite
+mutiny-db-journal

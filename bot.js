@@ -4,7 +4,7 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const SQLite = require("better-sqlite3");
-const sql = new SQLite('./scores.sqlite');
+const sql = new SQLite('./' + process.env.DATABASE_NAME);
 const helpCmds = require('./components/help/help.js');
 const findCmds = require('./components/find-member/find.js');
 const activityCmds = require('./components/activity-management/activity.js');
@@ -14,14 +14,12 @@ const guideCmds = require('./components/guides/guides.js');
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     let guild = client.guilds.cache.get(process.env.SERVER_ID);
-    const table = sql.prepare("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = 'mutiny';").get();
+    const table = sql.prepare("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = 'members';").get();
     if (!table['count(*)']) {
-        sql.prepare("CREATE TABLE mutiny (id INTEGER PRIMARY KEY AUTOINCREMENT, userId TEXT, userName TEXT, points INTEGER, tier TEXT, lastActivity TEXT, questCount INTEGER)").run();
-        sql.prepare("CREATE UNIQUE INDEX idx_mutiny_id ON mutiny (id);").run();
-        sql.pragma("synchronous = 1");
-        sql.pragma("journal_mode = wal");   
-        console.log("passed through creation, activity");
-        client.insertUser = sql.prepare("INSERT OR REPLACE INTO mutiny (userId, userName, points, tier, lastActivity, questCount) VALUES (@userId, @userName, @points, @tier, @lastActivity, @questCount)");   
+        sql.prepare("CREATE TABLE members (id INTEGER PRIMARY KEY AUTOINCREMENT, userId TEXT, userName TEXT, points INTEGER, tier TEXT, lastActivity TEXT, questCount INTEGER)").run();
+        sql.prepare("CREATE UNIQUE INDEX idx_members_id ON members (id);").run();
+        console.log("passed through creation, members");
+        client.insertUser = sql.prepare("INSERT OR REPLACE INTO members (userId, userName, points, tier, lastActivity, questCount) VALUES (@userId, @userName, @points, @tier, @lastActivity, @questCount)");   
 
         // add users to table
         let discUsers;
@@ -43,8 +41,6 @@ client.on('ready', () => {
     if (!tableEvents['count(*)']) {
         sql.prepare("CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, eventName TEXT, eventDate TEXT, eventTime TEXT, isRecurring INTEGER, serverName TEXT)").run();
         sql.prepare("CREATE UNIQUE INDEX idx_events_id ON events (id);").run();
-        sql.pragma("synchronous = 1");
-        sql.pragma("journal_mode = wal");   
         console.log("passed through creation, events");
     }
 
@@ -52,8 +48,6 @@ client.on('ready', () => {
     if (!tableBosses['count(*)']) {
         sql.prepare("CREATE TABLE bosses (id INTEGER PRIMARY KEY AUTOINCREMENT, bossName TEXT, bossDate TEXT, bossTime TEXT, alert INTEGER)").run();
         sql.prepare("CREATE UNIQUE INDEX idx_bosses_id ON events (id);").run();
-        sql.pragma("synchronous = 1");
-        sql.pragma("journal_mode = wal");   
         console.log("passed through creation, bosses");
     }
 
@@ -169,7 +163,7 @@ client.on('ready', () => {
 client.login(process.env.DISCORD_TOKEN);
 
 client.on('guildMemberAdd', member => {
-    client.insertUser = sql.prepare("INSERT OR REPLACE INTO mutiny (userId, userName, points, tier, lastActivity, questCount) VALUES (@userId, @userName, @points, @tier, @lastActivity, @questCount)");
+    client.insertUser = sql.prepare("INSERT OR REPLACE INTO members (userId, userName, points, tier, lastActivity, questCount) VALUES (@userId, @userName, @points, @tier, @lastActivity, @questCount)");
     let newUser = {
         userId: member.user.id,
         userName: member.user.username,
@@ -207,13 +201,13 @@ client.on('message', message => {
     }
 
     // Activity
-    client.updateUserPoints = sql.prepare("UPDATE mutiny SET points = ? WHERE userId = ?");
-    client.updateLastActivity = sql.prepare("UPDATE mutiny SET lastActivity = ? WHERE userId = ?");
-    client.updateQuestCount = sql.prepare("UPDATE mutiny SET questCount = ? WHERE userId = ?");
-    client.findUser = sql.prepare("SELECT * FROM mutiny WHERE userName = ?");
-    client.selectAll = sql.prepare("SELECT * FROM mutiny");
-    client.selectAllWithPoints = sql.prepare("SELECT * FROM mutiny WHERE points > 0 ORDER BY points DESC");
-    client.insertUser = sql.prepare("INSERT OR REPLACE INTO mutiny (userId, userName, points, tier, lastActivity, questCount) VALUES (@userId, @userName, @points, @tier, @lastActivity, @questCount)");   
+    client.updateUserPoints = sql.prepare("UPDATE members SET points = ? WHERE userId = ?");
+    client.updateLastActivity = sql.prepare("UPDATE members SET lastActivity = ? WHERE userId = ?");
+    client.updateQuestCount = sql.prepare("UPDATE members SET questCount = ? WHERE userId = ?");
+    client.findUser = sql.prepare("SELECT * FROM members WHERE userName = ?");
+    client.selectAll = sql.prepare("SELECT * FROM members");
+    client.selectAllWithPoints = sql.prepare("SELECT * FROM members WHERE points > 0 ORDER BY points DESC");
+    client.insertUser = sql.prepare("INSERT OR REPLACE INTO members (userId, userName, points, tier, lastActivity, questCount) VALUES (@userId, @userName, @points, @tier, @lastActivity, @questCount)");   
     // Events
     client.addEvent = sql.prepare("INSERT OR REPLACE INTO events (eventName, eventDate, eventTime, isRecurring, serverName) VALUES (@eventName, @eventDate, @eventTime, @isRecurring, @serverName)");
     // Bosses
@@ -467,12 +461,16 @@ client.on('message', message => {
                     + ('0' + dateArray[1]).slice(-2) + '/'
                     + dateArray[2];
 
+                let time = new Date(showDate);
+                let updatedTime = ('0' + time.getHours()).slice(-2) + ':'
+                + ('0' + time.getMinutes()).slice(-2) + ':00';
+
                 thisServerName = eventCmds.checkServerName(thisServerName);
 
                 let newEvent = {
                     eventName: thisEventName,
                     eventDate: postDate,
-                    eventTime:  new Date(showDate).toLocaleTimeString(),
+                    eventTime:  updatedTime,
                     isRecurring: thisIsRecurring,
                     serverName: thisServerName
                 }
